@@ -10,6 +10,7 @@ int main(){
   afficher_vecteur(vm);
 
   map *network = init_map(vm);
+  
   afficher_network_map(network);
 
   return 0;
