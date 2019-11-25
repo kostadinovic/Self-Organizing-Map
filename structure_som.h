@@ -20,7 +20,6 @@ typedef struct liste_data{ //faire un tableau car plus simple et on va pas chang
 typedef struct unitN{
   double *valeur; //valeur du vecteur dim4 a init avec vect_moyen+écart random
   char *nom;
-  double dist;
 }unitN;
 
 typedef struct map{ //la map où placer les unitN
@@ -40,7 +39,6 @@ rayon = 1 puis 2 puis 3
 typedef struct bmu{ // initialiser a 0,0 car le premier et le bmu a l'init
   int bmu_ligne;
   int bmu_colonne;
-  double norme;
   char *nom;
   struct bmu *suiv; //si d'autres bmu existe
 }bmu;
@@ -50,14 +48,17 @@ typedef struct bmu{ // initialiser a 0,0 car le premier et le bmu a l'init
 
 
 // définitions des fonctions
+
+//PARTIE INITIALISATIONS
 vect_data *alloc_vecteur_data(int taille_vec); //OK
 liste_data *alloc_liste_data(int nb_lignes_file, int taille_vec_file); //OK
 liste_data *init_liste_data(char *fichier); //OK
 liste_data *liste_from_vecteur(vect_data *vect); //OK
 void ajouter_fin_liste(vect_data *vect, liste_data *liste); //OK
-void afficher_vecteur(vect_data *vect); //OK
+void afficher_vecteur(vect_data *vect,int taille); //OK
 void afficher_liste(liste_data *liste); //OK
 int nombreLigne(char *fichier); //OK
+int tailleVect(char *fichier); //OK
 
 double normalise_vect(double *vect, int taille_vec); //OK
 void normaliser_liste(liste_data *liste); //OK
@@ -66,7 +67,19 @@ vect_data *vecteur_moyen(liste_data *liste); //OK
 
 unitN *alloc_unitN(int taille_vec);
 map *alloc_map(int taille_vec);
-void afficher_unitN(unitN *unit);
+void afficher_unitN(unitN *unit,int taille);
+void afficher_network_map_full(map *map_network, int taille);
 void afficher_network_map(map *map_network);
 map *init_map(vect_data *vecteur_moyen, int taille_vecteur);
 double aleatoire(double min, double max);
+
+//PARTIE APPRENTISSAGE
+double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect);
+bmu *alloc_bmu();
+bmu *new_bmu(int ligne, int colonne, char *nom);
+void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom);
+bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect);
+void afficher_bmu_full(bmu *liste_bmu);
+
+int indice_aleatoire(int min, int max); //OK
+void *shuffle(liste_data *liste); //OK

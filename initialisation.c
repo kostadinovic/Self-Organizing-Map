@@ -17,7 +17,7 @@ vect_data *alloc_vecteur_data(int taille_vec){
 liste_data *alloc_liste_data(int nb_lignes_file, int taille_vec_file){
   liste_data *liste=(liste_data*)(malloc(sizeof(liste_data)));
   liste->data=(vect_data*)(malloc(sizeof(vect_data)*nb_lignes_file));
-  liste->nb_lignes=nb_lignes_file; //pas dynamique il faut pas mettre de constante
+  liste->nb_lignes=nb_lignes_file; //enfin dynamique
   liste->taille_vec=taille_vec_file; //idem que en haut
   //printf("débug\n");
   //printf("%d\n",liste->nb_lignes);
@@ -50,8 +50,8 @@ void ajouter_fin_liste(vect_data *vect, liste_data *liste){
 liste_data *init_liste_data(char *nom_fichier){
   int nb_lignes_file = nombreLigne(nom_fichier);
   FILE *fichier = fopen(nom_fichier,"r");
-  printf("nb ligne = %d",nb_lignes_file);
-  int taille_vec_file = 4; //a calcler fonction i dont know comment
+  //printf("nb ligne = %d\n",nb_lignes_file); //debug
+  int taille_vec_file = tailleVect(nom_fichier);
   if(fichier==NULL || nb_lignes_file==0 ){
     printf("Erreur ouverture de fichier");
   }
@@ -69,7 +69,7 @@ liste_data *init_liste_data(char *nom_fichier){
     //printf("token= %s\n",token);
     vect_data *vecteur = alloc_vecteur_data(taille_vec_file);
     while(j < liste->taille_vec){
-      vecteur->valeur[j] = strtod(token,&end); //strtod
+      vecteur->valeur[j] = strtod(token,&end);
       token = strtok(NULL,",");
       //printf("token= %s\n",token);
       j++;
@@ -127,21 +127,20 @@ unitN *alloc_unitN(int taille_vecteur){
   unitN *unit=(unitN*)malloc(sizeof(unitN));
   unit->valeur=(double*)malloc(taille_vecteur*sizeof(double));
   unit->nom=(char*)malloc(sizeof(char)*50);
-  unit->dist=0;
   return unit;
 }
 
+//vérifier initalisation de la taille de map avec le prof
 map *alloc_map(int taille_vecteur){
   map *map_network=(map*)malloc(sizeof(map));
-  map_network->longueur=10;
-  map_network->largeur=6;
-  map_network->Grille=(unitN**)malloc(10*6*(sizeof(struct unitN))); //faux
+  map_network->longueur=6; //lignes
+  map_network->largeur=10; //colonnes
+  map_network->Grille=(unitN**)malloc(map_network->largeur*(sizeof(unitN*)));
 
   for(int i=0;i<map_network->longueur;i++){
-    for(int j=0;j<map_network->largeur;j++){
-      map_network->Grille[i]=(unitN*)malloc(map_network->longueur*map_network->largeur*sizeof(unitN*));
-    }
+    map_network->Grille[i]=(unitN*)malloc(map_network->largeur*sizeof(unitN));
   }
+
   for(int i=0;i<map_network->longueur;i++){
     for(int j=0;j<map_network->largeur;j++){
       map_network->Grille[i][j]=*alloc_unitN(taille_vecteur);
@@ -151,21 +150,25 @@ map *alloc_map(int taille_vecteur){
 }
 
 map *init_map(vect_data *vecteur_moyen, int taille_vecteur){
+  //int cpt=0;
   map *map_network=alloc_map(taille_vecteur);
   for(int i=0;i<map_network->longueur;i++){
     for(int j=0;j<map_network->largeur;j++){
-      for(int k=0;k<4;k++){
+      for(int k=0;k<taille_vecteur;k++){
         map_network->Grille[i][j].valeur[k]=aleatoire(vecteur_moyen->valeur[k] -0.02, vecteur_moyen->valeur[k] +0.05);
+        strcpy(map_network->Grille[i][j].nom,"*");
       }
+      //cpt++;
     }
   }
+  //printf("cpt = %d\n",cpt);
   return map_network;
 }
 
 /*        Fonctions de débug  ou très simples       */
 
-void afficher_vecteur(vect_data *vect){
-  for(int i=0;i<4;i++){
+void afficher_vecteur(vect_data *vect,int taille){
+  for(int i=0;i<taille;i++){
     printf("%f;",vect->valeur[i]);
   }
   printf("\n");
@@ -176,28 +179,40 @@ void afficher_vecteur(vect_data *vect){
 void afficher_liste(liste_data *liste){
   int i;
   for(i=0;i<liste->nb_lignes;i++){
-    afficher_vecteur(&liste->data[i]);
+    afficher_vecteur(&liste->data[i], liste->taille_vec);
   }
   //printf("nombre total de vecteur = %d\n",i);
 }
 
-void afficher_unitN(unitN *unit){
-  for(int i=0;i<4;i++){
+void afficher_unitN(unitN *unit,int taille){
+  for(int i=0;i<taille;i++){
     printf("%f;",unit->valeur[i]);
   }
   printf("\n");
   printf("%s\n",unit->nom);
-  printf("%f\n",unit->dist);
+}
+
+void afficher_network_map_full(map *map_network, int taille){
+  //int cpt=0;
+  for(int i=0;i<map_network->longueur;i++){
+    for(int j=0;j<map_network->largeur;j++){
+      printf("i=%d et j=%d\n",i,j);
+      afficher_unitN(&map_network->Grille[i][j],taille);
+      printf("\n");
+      //cpt++;
+    }
+  }
+  //printf("%d\n",cpt);
 }
 
 void afficher_network_map(map *map_network){
   for(int i=0;i<map_network->longueur;i++){
     for(int j=0;j<map_network->largeur;j++){
-      //printf("i=%d et j=%d\n",i,j);
-      afficher_unitN(&map_network->Grille[i][j]);
-      printf("\n");
+      printf("%s", map_network->Grille[i][j].nom);
     }
+    printf("\n");
   }
+
 }
 
 double aleatoire(double min, double max){
@@ -208,11 +223,37 @@ int nombreLigne(char *fichier){
   FILE *f = fopen(fichier,"r");
   int lignes=0;
   size_t taille =0;
-  char *tmp = malloc(taille);
-  while(getline(&tmp,&taille,f) != -1){
+  char *buffer = malloc(taille);
+  while(getline(&buffer,&taille,f) != -1){
     lignes++;
   }
-  if(tmp) free(tmp);
+  if(buffer) free(buffer);
   fclose(f);
   return lignes;
+}
+
+int tailleVect(char *fichier){
+  FILE *f = fopen(fichier,"r");
+  int nbVec=0;
+  size_t taille =0;
+  char *buffer = malloc(taille);
+  char *tmp = malloc(taille);
+
+  if(getline(&buffer,&taille,f) != -1){
+    while(1){ //comment éviter cette boucle je sais PAS
+      if(nbVec==0){
+        tmp = strtok(buffer, ",;:");
+      }
+      else{
+        tmp = strtok(NULL,",:;");
+      }
+      if(tmp==NULL){
+        break;
+      }
+      else{
+        nbVec++;
+      }
+    }
+  }
+  return nbVec-1; //je lui enlève le nom faire autrement?
 }
