@@ -56,6 +56,7 @@ bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect){
   return bmu_t;
 }
 
+
 void afficher_bmu_full(bmu *liste_bmu){
   int i=1;
   while(liste_bmu->suiv){
@@ -69,7 +70,7 @@ int indice_aleatoire(int min, int max){
   return rand()%(max-min+1)+min;
 }
 
-void *shuffle(liste_data *liste){
+void shuffle(liste_data *liste){
   int max = liste->nb_lignes;
   for(int i=0;i<max;i++){
     vect_data tmp = liste->data[i];
@@ -78,3 +79,6 @@ void *shuffle(liste_data *liste){
     liste->data[new_i] = tmp;
   }
 }
+
+
+void apprentissage(liste_data liste_donne);

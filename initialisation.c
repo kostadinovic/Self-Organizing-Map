@@ -79,22 +79,27 @@ liste_data *init_liste_data(char *nom_fichier){
     liste->data[i]=*vecteur; //ajout du vect ds tableau
     j=0;
   }
-  normaliser_liste(liste);
+  //normaliser_liste(liste, taille_vec_file);
   return liste;
 }
 
-double normalise_vect(double *vect, int taille_vec){
+double calculer_norme(double *vect, int taille_vec){
   double norme_vect=0;
+  double tmp =0;
   for(int i=0;i<taille_vec;i++){
-    norme_vect += pow(vect[i],2);
+    tmp += pow(vect[i],2);
   }
-  norme_vect=sqrt(norme_vect);
+  norme_vect=sqrt(tmp);
   return norme_vect;
 }
 
-void normaliser_liste(liste_data *liste){
+void normaliser_liste(liste_data *liste, int taille){
+  //int taille = liste->taille_vec;
   for(int i=0;i<liste->nb_lignes;i++){
-    liste->data[i].norme=normalise_vect(liste->data[i].valeur,liste->taille_vec);
+    liste->data[i].norme=calculer_norme(liste->data[i].valeur,taille);
+    for(int j=0;j<liste->taille_vec;j++){
+      liste->data[i].valeur[j] = (liste->data[i].valeur[j])/(liste->data[i].norme);
+    }
   }
 }
 
@@ -119,7 +124,12 @@ vect_data *vecteur_moyen(liste_data *liste){
   for(int i=0;i<taille_vecteur;i++){
     vecteur_moyen->valeur[i] = tab[i];
   }
-  vecteur_moyen->norme=normalise_vect(vecteur_moyen->valeur,taille_vecteur);
+  vecteur_moyen->norme=calculer_norme(vecteur_moyen->valeur,taille_vecteur);
+  //printf("LA NORME == %f",vecteur_moyen->norme);
+  for(int i=0;i<taille_vecteur;i++){
+    double n = vecteur_moyen->valeur[i]/(vecteur_moyen->norme);
+    vecteur_moyen->valeur[i] = n;
+  }
   return vecteur_moyen;
 }
 
@@ -135,7 +145,7 @@ map *alloc_map(int taille_vecteur){
   map *map_network=(map*)malloc(sizeof(map));
   map_network->longueur=6; //lignes
   map_network->largeur=10; //colonnes
-  map_network->Grille=(unitN**)malloc(map_network->largeur*(sizeof(unitN*)));
+  map_network->Grille=(unitN**)malloc(map_network->largeur*(sizeof(unitN*))); //ALLOCATION OK MTN
 
   for(int i=0;i<map_network->longueur;i++){
     map_network->Grille[i]=(unitN*)malloc(map_network->largeur*sizeof(unitN));

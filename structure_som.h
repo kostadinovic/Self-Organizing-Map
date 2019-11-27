@@ -60,8 +60,9 @@ void afficher_liste(liste_data *liste); //OK
 int nombreLigne(char *fichier); //OK
 int tailleVect(char *fichier); //OK
 
+double calculer_norme(double *vect, int taille_vec); //OK
 double normalise_vect(double *vect, int taille_vec); //OK
-void normaliser_liste(liste_data *liste); //OK
+void normaliser_liste(liste_data *liste, int taille); //OK
 
 vect_data *vecteur_moyen(liste_data *liste); //OK
 
@@ -74,12 +75,15 @@ map *init_map(vect_data *vecteur_moyen, int taille_vecteur);
 double aleatoire(double min, double max);
 
 //PARTIE APPRENTISSAGE
-double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect);
-bmu *alloc_bmu();
-bmu *new_bmu(int ligne, int colonne, char *nom);
-void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom);
-bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect);
-void afficher_bmu_full(bmu *liste_bmu);
+double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect); //OK
+bmu *alloc_bmu(); //OK
+bmu *new_bmu(int ligne, int colonne, char *nom); //OK
+void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom); //OK
+bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect); //OK
+void afficher_bmu_full(bmu *liste_bmu); //OK
 
 int indice_aleatoire(int min, int max); //OK
-void *shuffle(liste_data *liste); //OK
+void shuffle(liste_data *liste); //OK
+
+
+void apprentissage(liste_data liste_donne);
