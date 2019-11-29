@@ -1,6 +1,7 @@
 #include "structure_som.h"
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 
 /*      Fonction d'allocation et d'initialisation de ma structure à partir du fichier       */
@@ -215,6 +216,15 @@ void afficher_network_map_full(map *map_network, int taille){
   //printf("%d\n",cpt);
 }
 
+void afficher_map_debug(map *map_network){ //place DEBUG
+  for(int i=0;i<map_network->longueur;i++){
+    for(int j=0;j<map_network->largeur;j++){
+      afficher_unitN(&map_network->Grille[i][j],4);
+    }
+    printf("\n");
+  }
+
+}
 void afficher_network_map(map *map_network){
   for(int i=0;i<map_network->longueur;i++){
     for(int j=0;j<map_network->largeur;j++){
@@ -222,10 +232,10 @@ void afficher_network_map(map *map_network){
     }
     printf("\n");
   }
-
 }
 
 double aleatoire(double min, double max){
+  srand(time(NULL)+rand());
   return min+((max-min)*(rand()/(double)RAND_MAX));
 }
 

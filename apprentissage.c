@@ -56,6 +56,50 @@ bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect){
   return bmu_t;
 }
 
+void liberer_liste_bmu(bmu *mon_bmu){
+  if(mon_bmu == NULL) return;
+  while(mon_bmu){
+    bmu *tmp= mon_bmu->suiv;
+    //if(mon_bmu->nom == NULL) return;
+    //free(mon_bmu->nom);
+    //if(mon_bmu == NULL) return;
+    free(mon_bmu);
+    mon_bmu=tmp;
+  }
+  mon_bmu=NULL;
+}
+
+/*
+bmu *trouverBMUFinal(map *network, liste_data *ma_liste){
+  bmu *bmu_t;
+  bmu_t = new_bmu(0,0,network->Grille[0][0].nom);
+  double min = 100;
+  double distance_tmp = 0;
+  for(int i=0;i<network->longueur;i++){
+    for(int j=0;j<network->largeur;j++){
+      distance_tmp = dist_euclid(network->Grille[j][k].valeur, ma_liste->data[i].valeur,ma_liste->taille_vec);
+        if(distance_tmp < min){
+          printf("DEBUG1 %d,%d,%d\n",i,j,k);
+          min = distance_tmp;
+          liberer_liste_bmu(bmu_t);
+          bmu_t=new_bmu(i,j,network->Grille[i][j].nom);
+        }
+        if(distance_tmp == min){
+          if(bmu_t){
+            ajouter_bmu_fin(bmu_t,i,j,network->Grille[i][j].nom);
+          }else{
+            //bmu_t=new_bmu(i,j,network->Grille[i][j].nom);
+          }
+        }
+        afficher_bmu_full(bmu_t);
+      }
+    }
+  }
+  return bmu_t;
+}
+*/ //fonction inutile on veut pas faire ca à reutiliser dans le bloc appretentissage
+
+
 
 void afficher_bmu_full(bmu *liste_bmu){
   int i=1;
@@ -80,5 +124,47 @@ void shuffle(liste_data *liste){
   }
 }
 
+int calculer_rayon(map *network){
+  int nb_unit = (network->longueur*network->largeur)*0.5;
+  //printf("%d",nb_unit);
+  int rayon=0;
+  int nb_voisinage=0;
+  while(rayon<nb_unit){
+    rayon++;
+    nb_voisinage = nb_voisinage + (rayon*8);
+  }
+  return rayon;
+}
 
-void apprentissage(liste_data liste_donne);
+void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec){
+  int ligne_inf = best->bmu_ligne - rayon;
+  int colonne_inf = best->bmu_colonne - rayon;
+  int ligne_sup = best->bmu_ligne + rayon;
+  int colonne_sup = best->bmu_colonne + rayon;
+
+  if(ligne_inf<0) ligne_inf=0;
+  if(colonne_inf<0) colonne_inf=0;
+  if(ligne_sup>network->longueur) ligne_sup= network->longueur-1;
+  if(colonne_sup>network->largeur) colonne_sup= network->largeur-1;
+
+  for(; ligne_inf<=ligne_sup; ligne_inf++ ){ //for bizarre mais pour éviter l'erreur -Wunused-value (merci stackoverflow)
+    for(; colonne_inf<=colonne_sup;colonne_inf++){
+      for(int k=0;k<taille_vec;k++){ //enfin j'applique la formule d'apprentissage du cours
+        network->Grille[ligne_inf][colonne_inf].valeur[k] += alpha * (vecteur[k] - network->Grille[ligne_inf][colonne_inf].valeur[k]);
+        //network->Grille[ligne_inf][colonne_inf].nom="DEBUG: JE CHANGE MES VOISINS ICI";
+      }
+    }
+  }
+}
+
+void apprentissage(liste_data *donnees, int nb_vect, int taille_vect,map *network,){
+
+  bmu *best;
+
+  int nb_iterations = (500*taille_vect*0.25);
+  double alpha_initial = aleatoire(0.7,0.9);
+
+  for(int i=0; i<nb_iterations;i++){
+    if(rayon >)
+  }
+}
