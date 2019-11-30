@@ -81,14 +81,16 @@ bmu *alloc_bmu(); //OK
 bmu *new_bmu(int ligne, int colonne, char *nom); //OK
 void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom); //OK
 bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect); //OK
+int compter_nb_bmu(bmu *liste_bmu); //OK
+int alea(int max); //OK
 void afficher_bmu_full(bmu *liste_bmu); //OK
-bmu *trouverBMUFinal(map *network, liste_data *ma_liste);
+bmu *choisir_le_best(bmu *liste_bmu); //OK
 
 int indice_aleatoire(int min, int max); //OK
 void shuffle(liste_data *liste); //OK
 int calculer_rayon(map *network); //OK
 
 
-void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec);
+void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec); //OK
 
-void apprentissage(liste_data liste_donne);
+void apprentissage(liste_data liste_donne); //FONCTION FINALE 

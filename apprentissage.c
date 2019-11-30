@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "structure_som.h"
+#include <time.h>
 
 double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect){
   double d = 0;
@@ -69,35 +70,37 @@ void liberer_liste_bmu(bmu *mon_bmu){
   mon_bmu=NULL;
 }
 
-/*
-bmu *trouverBMUFinal(map *network, liste_data *ma_liste){
-  bmu *bmu_t;
-  bmu_t = new_bmu(0,0,network->Grille[0][0].nom);
-  double min = 100;
-  double distance_tmp = 0;
-  for(int i=0;i<network->longueur;i++){
-    for(int j=0;j<network->largeur;j++){
-      distance_tmp = dist_euclid(network->Grille[j][k].valeur, ma_liste->data[i].valeur,ma_liste->taille_vec);
-        if(distance_tmp < min){
-          printf("DEBUG1 %d,%d,%d\n",i,j,k);
-          min = distance_tmp;
-          liberer_liste_bmu(bmu_t);
-          bmu_t=new_bmu(i,j,network->Grille[i][j].nom);
-        }
-        if(distance_tmp == min){
-          if(bmu_t){
-            ajouter_bmu_fin(bmu_t,i,j,network->Grille[i][j].nom);
-          }else{
-            //bmu_t=new_bmu(i,j,network->Grille[i][j].nom);
-          }
-        }
-        afficher_bmu_full(bmu_t);
-      }
-    }
+int compter_nb_bmu(bmu *liste_bmu){
+  int i=1;
+  while(liste_bmu->suiv){
+    i++;
+    liste_bmu = liste_bmu->suiv;
   }
-  return bmu_t;
+  return i;
 }
-*/ //fonction inutile on veut pas faire ca à reutiliser dans le bloc appretentissage
+
+int alea(int max){
+  srand(time(NULL));
+  int r = rand()%max+1;
+  //printf("%d",r);
+  return r;
+}
+
+
+bmu *choisir_le_best(bmu *liste_bmu){
+  int nb_bmu = compter_nb_bmu(liste_bmu);
+  if(nb_bmu>1){
+    int r = alea(nb_bmu);
+    printf("\nnb = %d\nR =%d\n",nb_bmu,r);
+    int j=1;
+    while(j!=r && liste_bmu->suiv){
+      liste_bmu = liste_bmu->suiv;
+      j++;
+    }
+    return new_bmu(liste_bmu->bmu_ligne,liste_bmu->bmu_colonne,liste_bmu->nom);
+  }
+  return liste_bmu;
+}
 
 
 
@@ -108,6 +111,7 @@ void afficher_bmu_full(bmu *liste_bmu){
     liste_bmu = liste_bmu->suiv;
     i++;
   }
+  printf("BMU%d ; ligne=%d ; colonne=%d ; nom=%s\n",i,liste_bmu->bmu_ligne,liste_bmu->bmu_colonne,liste_bmu->nom);
 }
 
 int indice_aleatoire(int min, int max){
@@ -128,10 +132,8 @@ int calculer_rayon(map *network){
   int nb_unit = (network->longueur*network->largeur)*0.5;
   //printf("%d",nb_unit);
   int rayon=0;
-  int nb_voisinage=0;
   while(rayon<nb_unit){
     rayon++;
-    nb_voisinage = nb_voisinage + (rayon*8);
   }
   return rayon;
 }
@@ -157,14 +159,18 @@ void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur
   }
 }
 
+/*
 void apprentissage(liste_data *donnees, int nb_vect, int taille_vect,map *network,){
 
   bmu *best;
 
-  int nb_iterations = (500*taille_vect*0.25);
+  int nb_iterations = (500*nb_vect*0.25);
   double alpha_initial = aleatoire(0.7,0.9);
-
+  shuffle(donnees);
   for(int i=0; i<nb_iterations;i++){
-    if(rayon >)
+    best =
+
+    }
   }
 }
+*/
