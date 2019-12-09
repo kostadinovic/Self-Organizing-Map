@@ -93,4 +93,4 @@ int calculer_rayon(map *network); //OK
 
 void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec); //OK
 
-void apprentissage(liste_data liste_donne); //FONCTION FINALE 
+void apprentissage(liste_data *donnees, map *network); //FONCTION FINALE  KO

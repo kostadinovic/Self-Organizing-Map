@@ -5,8 +5,13 @@
 
 double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect){
   double d = 0;
+  printf("Début DE\n");
   for(int i=0; i<taille_vect;i++){
+    printf("DE : %d\n",i);
+    printf("Vecteur k[%d]=%f",i,vect_data[i]);
+    printf("Neurone k[%d]=%f",i,vect_neurone[i]);
     d += pow(fabs(vect_data[i]-vect_neurone[i]),2);
+    printf("DE dist =%f\n",d);
   }
   return sqrt(d);
 }
@@ -36,21 +41,30 @@ void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom){
 }
 
 bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect){
-  bmu *bmu_t;
-  bmu_t = new_bmu(0,0,network->Grille[0][0].nom);
+  bmu *bmu_t = NULL;
+  //bmu_t = new_bmu(0,0,network->Grille[0][0].nom);
   double min = 100;
   double distance_tmp = 0;
+  printf("Début \n");
   for(int i=0;i<network->longueur;i++){
+    printf("Boucle i=%d\n",i);
     for(int j=0;j<network->largeur;j++){
+      printf("Boucle j =%d\n",j);
       distance_tmp = dist_euclid(network->Grille[i][j].valeur, vecteur->valeur,taille_vect);
+      printf("Distance tmp=%f\n",distance_tmp);
+      //printf("MIN = %f, TMP = %f\n",min,distance_tmp);
+      if(distance_tmp == min){ //pas de cas dans mes essais
+        printf("DEBUG TA \n");
+        ajouter_bmu_fin(bmu_t,i,j,network->Grille[i][j].nom);
+        printf("DEBUG TB \n");
+      }
       if(distance_tmp < min){
+        printf("DEBUG AA \n");
         min = distance_tmp;
         free(bmu_t);
         bmu_t = NULL;
         bmu_t=new_bmu(i,j,network->Grille[i][j].nom);
-      }
-      if(distance_tmp == min){
-        ajouter_bmu_fin(bmu_t,i,j,network->Grille[i][j].nom);
+        printf("DEBUG b b \n");
       }
     }
   }
@@ -91,7 +105,7 @@ bmu *choisir_le_best(bmu *liste_bmu){
   int nb_bmu = compter_nb_bmu(liste_bmu);
   if(nb_bmu>1){
     int r = alea(nb_bmu);
-    printf("\nnb = %d\nR =%d\n",nb_bmu,r);
+    //printf("\nnb = %d\nR =%d\n",nb_bmu,r);
     int j=1;
     while(j!=r && liste_bmu->suiv){
       liste_bmu = liste_bmu->suiv;
@@ -129,13 +143,7 @@ void shuffle(liste_data *liste){
 }
 
 int calculer_rayon(map *network){
-  int nb_unit = (network->longueur*network->largeur)*0.5;
-  //printf("%d",nb_unit);
-  int rayon=0;
-  while(rayon<nb_unit){
-    rayon++;
-  }
-  return rayon;
+  return (network->longueur*network->largeur)*0.5;
 }
 
 void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec){
@@ -153,24 +161,48 @@ void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur
     for(; colonne_inf<=colonne_sup;colonne_inf++){
       for(int k=0;k<taille_vec;k++){ //enfin j'applique la formule d'apprentissage du cours
         network->Grille[ligne_inf][colonne_inf].valeur[k] += alpha * (vecteur[k] - network->Grille[ligne_inf][colonne_inf].valeur[k]);
-        //network->Grille[ligne_inf][colonne_inf].nom="DEBUG: JE CHANGE MES VOISINS ICI";
+        network->Grille[ligne_inf][colonne_inf].nom="N";
       }
     }
   }
 }
 
-/*
-void apprentissage(liste_data *donnees, int nb_vect, int taille_vect,map *network,){
 
+void apprentissage(liste_data *donnees, map *network){
+
+  bmu *bmu_liste;
   bmu *best;
+  int taille_du_vecteur =donnees->taille_vec;
+  int nb_vect =donnees->nb_lignes;
+  int nb_it_total =(500*nb_vect);
+  int phase2 =nb_it_total/5;
+  double alpha =aleatoire(0.7,0.9);
+  double ca = 0.0;
+  int rayon;
+  for(int i=0;i< nb_it_total; i++){
+    shuffle(donnees);
 
-  int nb_iterations = (500*nb_vect*0.25);
-  double alpha_initial = aleatoire(0.7,0.9);
-  shuffle(donnees);
-  for(int i=0; i<nb_iterations;i++){
-    best =
-
+    if(i <=phase2){
+      ca = (double)(i/nb_it_total); //pour mettre à jour le coeff d'APPRENTISSAGE
+      alpha = alpha*(1-ca);
+      rayon = calculer_rayon(network);
+      for(int j=0;j<nb_vect-1;j++){
+        printf("DEBUG APP :  i = %d et j = %d\n", i,j);
+        bmu_liste = trouverBMU(network, &donnees->data[j], taille_du_vecteur);
+        printf("FIN :  i = %d et j = %d\n", i,j);
+        best = choisir_le_best(bmu_liste);
+        voisinage(best,network,rayon,alpha,donnees->data[j].valeur,taille_du_vecteur);
+      }
+    }
+    else{
+      ca = (double)(i/nb_it_total); //pour mettre à jour le coeff d'APPRENTISSAGE
+      alpha = alpha*(1-ca)*0.1; //juste en phase2
+      rayon = 3;
+      for(int j=0;j<nb_vect;j++){
+        bmu_liste = trouverBMU(network, &donnees->data[j], taille_du_vecteur);
+        best = choisir_le_best(bmu_liste);
+        voisinage(best,network,rayon,alpha,donnees->data[j].valeur,taille_du_vecteur);
+      }
     }
   }
 }
-*/
