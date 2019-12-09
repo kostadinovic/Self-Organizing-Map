@@ -80,7 +80,7 @@ double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect); //
 bmu *alloc_bmu(); //OK
 bmu *new_bmu(int ligne, int colonne, char *nom); //OK
 void ajouter_bmu_fin(bmu *liste_de_bmu, int ligne, int colonne, char *nom); //OK
-bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect); //OK
+bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect, int i, int j); //OK
 int compter_nb_bmu(bmu *liste_bmu); //OK
 int alea(int max); //OK
 void afficher_bmu_full(bmu *liste_bmu); //OK
