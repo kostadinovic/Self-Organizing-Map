@@ -77,7 +77,7 @@ liste_data *init_liste_data(char *nom_fichier){
     }
     strcpy(vecteur->nom,token);
     token=NULL;
-    liste->data[i]=*vecteur; //ajout du vect ds tableau
+    liste->data[i]= *vecteur; //ajout du vect ds tableau
     j=0;
   }
   //normaliser_liste(liste, taille_vec_file);
@@ -179,6 +179,7 @@ map *init_map(vect_data *vecteur_moyen, int taille_vecteur){
 /*        Fonctions de débug  ou très simples       */
 
 void afficher_vecteur(vect_data *vect,int taille){
+  if(vect == NULL) printf("ERREUR VECT VIDE");
   for(int i=0;i<taille;i++){
     printf("%f;",vect->valeur[i]);
   }
@@ -188,6 +189,7 @@ void afficher_vecteur(vect_data *vect,int taille){
 }
 
 void afficher_liste(liste_data *liste){
+  if(liste == NULL) printf("ERREUR LISTE VIDE");
   int i;
   for(i=0;i<liste->nb_lignes;i++){
     afficher_vecteur(&liste->data[i], liste->taille_vec);
@@ -225,12 +227,34 @@ void afficher_map_debug(map *map_network){ //place DEBUG
   }
 
 }
+
 void afficher_network_map(map *map_network){
   for(int i=0;i<map_network->longueur;i++){
     for(int j=0;j<map_network->largeur;j++){
       printf("%s", map_network->Grille[i][j].nom);
     }
     printf("\n");
+  }
+  printf("\n");
+  printf("\n");
+}
+
+void update_name(map *map_network){
+  char *s = "S";
+  char *v = "V";
+  char *c = "C";
+  for(int i=0;i<map_network->longueur;i++){
+    for(int j=0;j<map_network->largeur;j++){
+      if(strcmp(map_network->Grille[i][j].nom, "Iris-setosa\n") == 0){
+        strcpy(map_network->Grille[i][j].nom,s);
+      }
+      if(strcmp(map_network->Grille[i][j].nom, "Iris-virginica\n") == 0){
+        strcpy(map_network->Grille[i][j].nom,v);
+      }
+      if(strcmp(map_network->Grille[i][j].nom, "Iris-versicolor\n") == 0){
+        strcpy(map_network->Grille[i][j].nom,c);
+      }
+    }
   }
 }
 

@@ -2,11 +2,12 @@
 #include <math.h>
 #include "structure_som.h"
 #include <time.h>
+#include <string.h>
 
 double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect){
   double d = 0.0;
   for(int i=0; i<taille_vect;i++){
-    d += pow(vect_data[i]-vect_neurone[i],2);
+    d += pow(fabs(vect_data[i]-vect_neurone[i]),2);
   }
   return sqrt(d);
 }
@@ -42,10 +43,6 @@ bmu *trouverBMU(map *network, vect_data *vecteur, int taille_vect,int ii, int jj
   double distance_tmp = 0;
   for(int i=0;i<network->longueur;i++){
     for(int j=0;j<network->largeur;j++){
-      if(network->Grille[i][j].valeur == NULL){
-        printf("vect unit null\n");
-        break;
-      }
       if(vecteur->valeur == NULL){
         printf("BREAK : i=%d   j=%d\n",ii,jj);
         printf("vect data null\n");
@@ -98,7 +95,6 @@ int alea(int max){
   return r;
 }
 
-
 bmu *choisir_le_best(bmu *liste_bmu){
   int nb_bmu = compter_nb_bmu(liste_bmu);
   if(nb_bmu>1){
@@ -114,8 +110,6 @@ bmu *choisir_le_best(bmu *liste_bmu){
   return liste_bmu;
 }
 
-
-
 void afficher_bmu_full(bmu *liste_bmu){
   int i=1;
   while(liste_bmu->suiv){
@@ -127,8 +121,9 @@ void afficher_bmu_full(bmu *liste_bmu){
 }
 
 int indice_aleatoire(int min, int max){
-  return rand()%(max-min+1)+min;
+  return rand()%(max-min)+min;
 }
+
 
 void shuffle(liste_data *liste){
   int max = liste->nb_lignes;
@@ -144,7 +139,8 @@ int calculer_rayon(map *network){
   return (network->longueur*network->largeur)*0.5;
 }
 
-void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec){
+void voisinage(bmu *best, map *network, int rayon, double alpha, vect_data *v, int taille_vec){
+  double *vecteur = v->valeur;
   int ligne_inf = best->bmu_ligne - rayon;
   int colonne_inf = best->bmu_colonne - rayon;
   int ligne_sup = best->bmu_ligne + rayon;
@@ -159,7 +155,7 @@ void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur
     for(; colonne_inf<=colonne_sup;colonne_inf++){
       for(int k=0;k<taille_vec;k++){ //enfin j'applique la formule d'apprentissage du cours
         network->Grille[ligne_inf][colonne_inf].valeur[k] += alpha * (vecteur[k] - network->Grille[ligne_inf][colonne_inf].valeur[k]);
-        network->Grille[ligne_inf][colonne_inf].nom="N";
+        strcpy(network->Grille[ligne_inf][colonne_inf].nom, v->nom);
       }
     }
   }
@@ -170,38 +166,42 @@ void apprentissage(liste_data *donnees, map *network){
 
   bmu *bmu_liste;
   bmu *best;
-  int taille_du_vecteur =donnees->taille_vec;
-  int nb_vect =donnees->nb_lignes;
-  int nb_it_total =(500*nb_vect);
-  int phase2 =nb_it_total/5;
-  double alpha =aleatoire(0.7,0.9);
-  double ca = 0.0;
+  int taille_du_vecteur=donnees->taille_vec;
+  int nb_vect=donnees->nb_lignes;
+  int nb_it_total=(500*taille_du_vecteur);
+  int phase2=3*nb_it_total/4;
+  double alpha_init=aleatoire(0.7,0.9);
+  double alpha=0.0;
+  double ca= 0.0;
   int rayon;
-  printf("NB VECT : %d",nb_vect);
+  //printf("NB VECT : %d",nb_vect);
   for(int i=0;i< nb_it_total; i++){
     shuffle(donnees);
 
     if(i <=phase2){
       ca = (double)(i/nb_it_total); //pour mettre à jour le coeff d'APPRENTISSAGE
-      alpha = alpha*(1-ca);
+      alpha = alpha_init*(1-ca);
       rayon = calculer_rayon(network);
       for(int j=0;j<nb_vect-1;j++){
         //printf("apprentissage avant bmu:  i = %d et j = %d\n", i,j);
         bmu_liste = trouverBMU(network, &donnees->data[j], taille_du_vecteur,i,j);
         //printf("apprentissage après bmu :  i = %d et j = %d\n", i,j);
+        if(bmu_liste == NULL) printf("ERREUR LISTE DE BMU VIDE : i=%d , j=%d",i,j);
         best = choisir_le_best(bmu_liste);
-        voisinage(best,network,rayon,alpha,donnees->data[j].valeur,taille_du_vecteur);
+        voisinage(best,network,rayon,alpha,&donnees->data[j],taille_du_vecteur);
       }
     }
     else{
       ca = (double)(i/nb_it_total); //pour mettre à jour le coeff d'APPRENTISSAGE
-      alpha = alpha*(1-ca)*0.1; //juste en phase2
-      rayon = 3;
+      alpha = alpha_init*(1-ca)*0.1; //juste en phase2
+      rayon = 1;
       for(int j=0;j<nb_vect;j++){
         bmu_liste = trouverBMU(network, &donnees->data[j], taille_du_vecteur,i,j);
         best = choisir_le_best(bmu_liste);
-        voisinage(best,network,rayon,alpha,donnees->data[j].valeur,taille_du_vecteur);
+        voisinage(best,network,rayon,alpha,&donnees->data[j],taille_du_vecteur);
       }
     }
+    update_name(network);
+    afficher_network_map(network);
   }
 }

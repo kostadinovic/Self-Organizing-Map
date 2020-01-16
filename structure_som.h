@@ -74,6 +74,7 @@ void afficher_network_map(map *map_network);
 map *init_map(vect_data *vecteur_moyen, int taille_vecteur);
 double aleatoire(double min, double max);
 void afficher_map_debug(map *map_network);
+void update_name(map *map_network);
 
 //PARTIE APPRENTISSAGE
 double dist_euclid(double *vect_data, double *vect_neurone, int taille_vect); //OK
@@ -91,6 +92,5 @@ void shuffle(liste_data *liste); //OK
 int calculer_rayon(map *network); //OK
 
 
-void voisinage(bmu *best, map *network, int rayon, double alpha, double *vecteur, int taille_vec); //OK
-
-void apprentissage(liste_data *donnees, map *network); //FONCTION FINALE  KO
+void voisinage(bmu *best, map *network, int rayon, double alpha, vect_data *v, int taille_vec); //OK
+void apprentissage(liste_data *donnees, map *network); //FONCTION FINALE Ok partiel
