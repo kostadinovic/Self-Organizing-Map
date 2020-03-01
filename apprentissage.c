@@ -141,18 +141,33 @@ int calculer_rayon(map *network){
 
 void voisinage(bmu *best, map *network, int rayon, double alpha, vect_data *v, int taille_vec){
   double *vecteur = v->valeur;
-  int ligne_inf = best->bmu_ligne - rayon;
-  int colonne_inf = best->bmu_colonne - rayon;
-  int ligne_sup = best->bmu_ligne + rayon;
-  int colonne_sup = best->bmu_colonne + rayon;
+  int ligne_inf; // = best->bmu_ligne - rayon;
+  int colonne_inf; // = best->bmu_colonne - rayon;
+  int ligne_sup; // = best->bmu_ligne + rayon;
+  int colonne_sup; // = best->bmu_colonne + rayon;
 
-  if(ligne_inf<0) ligne_inf=0;
-  if(colonne_inf<0) colonne_inf=0;
-  if(ligne_sup>network->longueur) ligne_sup= network->longueur-1;
-  if(colonne_sup>network->largeur) colonne_sup= network->largeur-1;
+  if(best->bmu_ligne - rayon<0)
+    ligne_inf=0;
+  else
+    ligne_inf = best->bmu_ligne - rayon;
 
-  for(; ligne_inf<=ligne_sup; ligne_inf++ ){ //for bizarre mais pour éviter l'erreur -Wunused-value (merci stackoverflow)
-    for(; colonne_inf<=colonne_sup;colonne_inf++){
+  if(best->bmu_colonne - rayon <0)
+    colonne_inf=0;
+  else
+    colonne_inf = best->bmu_colonne - rayon;
+
+  if(best->bmu_ligne + rayon > network->longueur - 1)
+    ligne_sup= network->longueur-1;
+  else
+    ligne_sup = best->bmu_ligne + rayon;
+
+  if(best->bmu_colonne + rayon >network->largeur-1)
+    colonne_sup= network->largeur-1;
+  else
+    colonne_sup=best->bmu_colonne + rayon;
+
+  for(; ligne_inf<ligne_sup; ligne_inf++ ){ //for bizarre mais pour éviter l'erreur -Wunused-value (merci stackoverflow)
+    for(; colonne_inf<colonne_sup;colonne_inf++){
       for(int k=0;k<taille_vec;k++){ //enfin j'applique la formule d'apprentissage du cours
         network->Grille[ligne_inf][colonne_inf].valeur[k] += alpha * (vecteur[k] - network->Grille[ligne_inf][colonne_inf].valeur[k]);
         strcpy(network->Grille[ligne_inf][colonne_inf].nom, v->nom);
